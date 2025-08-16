@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
+    'action',
+    'rest_framework',
+    'drf_spectacular'
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +79,12 @@ WSGI_APPLICATION = 'TaskManagementAPI.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'TaskManagement',
+        'PASSWORD': 'admin',
+        'USER': 'postgres',
+        'HOST': 'localhost',
+        'POST': '5432',
     }
 }
 
