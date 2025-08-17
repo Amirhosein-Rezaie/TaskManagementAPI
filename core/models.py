@@ -21,6 +21,12 @@ class Users(AbstractUser):
         max_length=100, null=False, blank=False
     )
 
+    email = None
+    is_staff = None
+    date_joined = None
+    groups = None
+    user_permissions = None
+
     class Meta:
         db_table = 'Users'
 
@@ -66,6 +72,13 @@ class Tasks(models.Model):
         PICKED = "picked",
         PENDING = 'pending'
 
+    class Levels(models.IntegerChoices):
+        ONE = 1
+        TWO = 2
+        THREE = 3
+        FOUR = 4
+        FIVE = 5
+
     title = models.CharField(
         max_length=100, null=False, blank=False
     )
@@ -79,7 +92,7 @@ class Tasks(models.Model):
         Users, on_delete=models.CASCADE, null=False, blank=False, related_name='user_task'
     )
     level = models.IntegerField(
-        choices=[n for n in range(1, 6)], null=False, blank=False
+        choices=Levels, null=False, blank=False
     )
     deadline = models.DateField(
         null=False, blank=False

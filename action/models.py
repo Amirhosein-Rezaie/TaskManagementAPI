@@ -11,10 +11,10 @@ class Tags(models.Model):
         DONE = "Done"
 
     user = models.ForeignKey(
-        Users, null=False, blank=False, related_name='user_tag'
+        Users, null=False, blank=False, related_name='user_tag', on_delete=models.CASCADE
     )
     task = models.ForeignKey(
-        Tasks, null=False, blank=False, related_name='tag_task'
+        Tasks, null=False, blank=False, related_name='tag_task', on_delete=models.CASCADE
     )
     title = models.CharField(
         choices=Titles, null=False, blank=False, default=Titles.TODO
@@ -35,8 +35,15 @@ class Tags(models.Model):
 
 # set score for users(foreman)
 class Scores(models.Model):
+    class ScoresList(models.IntegerChoices):
+        ONE = 1
+        TWO = 2
+        THREE = 3
+        FOUR = 4
+        FIVE = 5
+
     score = models.IntegerField(
-        choices=[n for n in range(1, 6)], null=False, blank=False
+        choices=ScoresList, null=False, blank=False
     )
     user = models.ForeignKey(
         Users, on_delete=models.CASCADE, null=False, blank=False
