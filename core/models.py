@@ -26,6 +26,7 @@ class Users(AbstractUser):
     date_joined = None
     groups = None
     user_permissions = None
+    last_login = None
 
     class Meta:
         db_table = 'Users'
