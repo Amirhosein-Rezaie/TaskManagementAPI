@@ -70,8 +70,8 @@ class Projects(models.Model):
 
 class Tasks(models.Model):
     class Status(models.TextChoices):
-        PICKED = "picked",
-        PENDING = 'pending'
+        PICKED = "picked"
+        PENDING = "pending"
 
     class Levels(models.IntegerChoices):
         ONE = 1
