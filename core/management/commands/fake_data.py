@@ -63,7 +63,9 @@ class Command(BaseCommand):
                 ),
                 description=faker_fa.text(max_nb_chars=200),
                 user=random.choice(
-                    list(CoreModels.Users.objects.all())
+                    list(CoreModels.Users.objects.filter(
+                        role=CoreModels.Users.Roles.MANAGER)
+                    )
                 ),
                 level=random.choice(task_levels_score),
                 deadline=faker_fa.future_date(

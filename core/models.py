@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 
 class Users(AbstractUser):
@@ -60,12 +62,22 @@ class Projects(models.Model):
         max_length=100, choices=Status,
         default=Status.IN_PROGRESS, null=False, blank=False
     )
+    done_date = models.DateField(
+        null=True, blank=True
+    )
 
     class Meta:
         db_table = "Projects"
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        status = self.status
+        if status == self.Status.DONE and self.done_date is None:
+            self.done_date = timezone.now().date()
+
+        return super().save(*args, **kwargs)
 
 
 class Tasks(models.Model):
@@ -107,3 +119,11 @@ class Tasks(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        user = self.user
+        if user.role != Users.Roles.MANAGER:
+            raise ValidationError(
+                detail='نقض کاربر باید manager باشد ... !'
+            )
+        return super().save(*args, **kwargs)
