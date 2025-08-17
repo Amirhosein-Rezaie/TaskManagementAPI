@@ -88,6 +88,6 @@ class ProjectMembers(models.Model):
         return f"{self.member} -> {self.project}"
 
     def save(self, *args, **kwargs):
-        if self.status == self.Status.LEFT_PROJECT and self.left_date in None:
+        if self.status == self.Status.LEFT_PROJECT and self.left_date is None:
             self.left_date = timezone.now().date()
         super().save(*args, **kwargs)
