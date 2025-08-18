@@ -92,26 +92,27 @@ class Command(BaseCommand):
         # inserting scores
         print("inserting into scores ... ", end='')
         for _ in range(CoreModels.Users.objects.filter(role=user_roles[1]).count()):
+            task = random.choice(CoreModels.Tasks.objects.all())
             ActionModels.Scores.objects.create(
-                score=random.randint(1, 5),
+                score=task.level,
                 user=random.choice(
                     list(CoreModels.Users.objects.filter(role=user_roles[1]))
                 ),
-                task=random.choice(
-                    CoreModels.Tasks.objects.all()
-                ),
+                task=task,
             )
         print('OK')
 
         # inserting project_members
-        print("inserting into scores ... ", end='')
+        print("inserting into project_members ... ", end='')
         for _ in range(CoreModels.Projects.objects.all().count() * 3):
             ActionModels.ProjectMembers.objects.create(
                 member=random.choice(
                     list(CoreModels.Users.objects.filter(role=user_roles[1]))
                 ),
                 project=random.choice(
-                    list(CoreModels.Projects.objects.all())
+                    list(CoreModels.Projects.objects.filter(
+                        status=CoreModels.Projects.Status.IN_PROGRESS
+                    ))
                 ),
                 status=random.choice(member_status),
             )
