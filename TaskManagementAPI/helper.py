@@ -9,8 +9,17 @@ from django.db.models import (
 )
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models.constants import LOOKUP_SEP
+from django.core.exceptions import FieldDoesNotExist, FieldError
+
+
+# set limit of paginators in class and function base views
+def limit_paginate(request: Request, pagination_class: PageNumberPagination):
+    """
+    get limit from query params and return
+    """
+    if request.query_params.get('limit'):
+        return request.query_params.get('limit')
+    return pagination_class.page_size
 
 
 # functions
@@ -26,6 +35,7 @@ def dynamic_search(
     like = "istartswith"
     out_query_params = ['limit', 'page']
     paginator = pagination_class
+    equal_to_fields = ['id']
 
     query_params = request.query_params
     if query_params:
@@ -34,6 +44,7 @@ def dynamic_search(
         for key, value in query_params.items():
             if key in out_query_params:
                 continue
+
             if not value:
                 return Response(
                     {
@@ -42,44 +53,51 @@ def dynamic_search(
                     },
                     status=status.HTTP_400_BAD_REQUEST)
 
-            field_path = key.split(LOOKUP_SEP)[0]
+            search_items = key.split('-')
+            field_name = search_items[0]
 
             try:
-                field_obj = model._meta.get_field(field_path)
-            except FieldDoesNotExist as e:
-                return Response({
-                    "error": str(e),
-                    "message": f"فیلد ارسالی معتبر نیست : {key}",
-                    "detail": f"فیلد ارسالی وجود ندارد : {key}"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                field_obj = model._meta.get_field(field_name)
 
-            # Handle relation fields
-            if isinstance(field_obj, (ForeignKey, OneToOneField, ManyToManyField)):
-                related_model = field_obj.related_model
-                related_fields = [
-                    f.name for f in related_model._meta.get_fields()
-                    if isinstance(f, (CharField, TextField, IntegerField)) and f.name != 'id'
-                ]
-                sub_query = Q()
-                for sub_field in related_fields:
-                    sub_query |= Q(
-                        **{f"{key}__{sub_field}__{like}": value})
-                query_search &= sub_query
-            else:
-                # Detect appropriate lookup
-                if isinstance(field_obj, (CharField, TextField)):
-                    query_search &= Q(**{f"{key}__{like}": value})
+                if isinstance(field_obj, (ForeignKey, ManyToManyField, OneToOneField)):
+                    try:
+                        sub_field_name = search_items[1]
+                        if sub_field_name.lower() not in equal_to_fields:
+                            query_search &= Q(
+                                **{f"{field_name}__{sub_field_name}__{like}": value}
+                            )
+                        else:
+                            query_search &= Q(
+                                **{f"{field_name}__{sub_field_name}": value}
+                            )
+                    except IndexError:
+                        return Response(
+                            data={
+                                "error": "Set second field for foreign fields",
+                                "message": "برای کلید های خارجی حتما فیلد دوم تعیین کنید"
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
                 else:
-                    # For other fields like int, bool, datetime: exact match
-                    query_search &= Q(**{key: value})
+                    if field_name.lower() not in equal_to_fields:
+                        query_search &= Q(
+                            **{f"{field_name}__{like}": value}
+                        )
+                    else:
+                        query_search &= Q(
+                            **{f"{field_name}": value}
+                        )
+            except (FieldDoesNotExist, FieldError):
+                return Response(
+                    data={
+                        "error": "Not found field",
+                        "message": "فیلد مورد نظر یافت نشد"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        founds = model.objects.filter(query_search).distinct()
-
-        if query_params.get('limit'):
-            if query_params.get('limit').lower() == 'none':
-                return Response(serializer(founds, many=True).data, status=status.HTTP_200_OK)
-            paginator.page_size = query_params.get('limit')
-
-        paginated_founds = paginator.paginate_queryset(founds, request=request)
+        founds = model.objects.filter(query_search)
+        limit_paginate(request=request, pagination_class=paginator)
+        paginated_founds = paginator.paginate_queryset(founds, request)
         serialize_found = serializer(paginated_founds, many=True)
         return paginator.get_paginated_response(serialize_found.data)
