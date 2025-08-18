@@ -1,6 +1,7 @@
 from django.db import models
 from core.models import (Users, Tasks, Projects)
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 
 # tag on the tasks by users(foremans)
@@ -32,6 +33,14 @@ class Tags(models.Model):
     def __str__(self):
         return f"{self.user} -> {self.task}"
 
+    def save(self, *args, **kwargs):
+        user = self.user
+        if user.role != Users.Roles.FOREMAN:
+            raise ValidationError(
+                detail='مقدار کاربر باید foreman باشد ... !',
+            )
+        return super().save(*args, **kwargs)
+
 
 # set score for users(foreman)
 class Scores(models.Model):
@@ -57,6 +66,14 @@ class Scores(models.Model):
 
     def __str__(self):
         return f"{self.user} -> {self.task} => {self.score}"
+
+    def save(self, *args, **kwargs):
+        user = self.user
+        if user.role != Users.Roles.FOREMAN:
+            raise ValidationError(
+                detail='مقدار کاربر باید foreman باشد ... !',
+            )
+        return super().save(*args, **kwargs)
 
 
 # members of every projects model
@@ -88,6 +105,11 @@ class ProjectMembers(models.Model):
         return f"{self.member} -> {self.project}"
 
     def save(self, *args, **kwargs):
+        user = self.member
+        if user.role != Users.Roles.FOREMAN:
+            raise ValidationError(
+                detail='مقدار کاربر باید foreman باشد ... !',
+            )
         if self.status == self.Status.LEFT_PROJECT and self.left_date is None:
             self.left_date = timezone.now().date()
         super().save(*args, **kwargs)
