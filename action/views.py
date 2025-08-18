@@ -11,6 +11,13 @@ from .models import (
 from .serializers import (
     TagsSerializer, ScoresSerializer, ProjectMembersSerializer
 )
+from rest_framework.request import Request
+from TaskManagementAPI.helper import (
+    dynamic_search
+)
+from TaskManagementAPI.pagination import (
+    DynamicPagination
+)
 
 
 # tags api
@@ -21,6 +28,14 @@ class TagsAPI(
     serializer_class = TagsSerializer
     queryset = Tags.objects.all()
 
+    def list(self, request: Request, *args, **kwargs):
+        if request.query_params:
+            return dynamic_search(
+                request=request, model=Tags, serializer=TagsSerializer,
+                pagination_class=DynamicPagination()
+            )
+        return super().list(request, *args, **kwargs)
+
 
 # scores api
 class ScoresAPI(
@@ -30,6 +45,14 @@ class ScoresAPI(
     serializer_class = ScoresSerializer
     queryset = Scores.objects.all()
 
+    def list(self, request: Request, *args, **kwargs):
+        if request.query_params:
+            return dynamic_search(
+                request=request, model=Scores, serializer=ScoresSerializer,
+                pagination_class=DynamicPagination()
+            )
+        return super().list(request, *args, **kwargs)
+
 
 # Memeber api
 class MembersAPI(
@@ -38,3 +61,11 @@ class MembersAPI(
 ):
     serializer_class = ProjectMembersSerializer
     queryset = ProjectMembers.objects.all()
+
+    def list(self, request: Request, *args, **kwargs):
+        if request.query_params:
+            return dynamic_search(
+                request=request, model=ProjectMembers, serializer=ProjectMembersSerializer,
+                pagination_class=DynamicPagination()
+            )
+        return super().list(request, *args, **kwargs)
