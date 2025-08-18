@@ -73,6 +73,10 @@ class Scores(models.Model):
             raise ValidationError(
                 detail='مقدار کاربر باید foreman باشد ... !',
             )
+        if self.score != self.task.level:
+            raise ValidationError(
+                detail='مقدار امتیاز باید با سطح تسک مساوی باشد ... !',
+            )
         return super().save(*args, **kwargs)
 
 
@@ -112,4 +116,8 @@ class ProjectMembers(models.Model):
             )
         if self.status == self.Status.LEFT_PROJECT and self.left_date is None:
             self.left_date = timezone.now().date()
+        if self.project.status == Projects.Status.DONE:
+            raise ValidationError(
+                detail='این پروژه قبلا کامل شده است ... !',
+            )
         super().save(*args, **kwargs)
