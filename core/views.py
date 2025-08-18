@@ -8,6 +8,13 @@ from .serializers import (
 from .models import (
     Users, Projects, Tasks
 )
+from rest_framework.request import Request
+from TaskManagementAPI.helper import (
+    dynamic_search
+)
+from TaskManagementAPI.pagination import (
+    DynamicPagination
+)
 
 
 # views
@@ -15,6 +22,14 @@ from .models import (
 class UsersAPI(ModelViewSet):
     serializer_class = UsersSerializer
     queryset = Users.objects.all()
+
+    def list(self, request: Request, *args, **kwargs):
+        if request.query_params:
+            return dynamic_search(
+                request=request, model=Users, serializer=UsersSerializer,
+                pagination_class=DynamicPagination()
+            )
+        return super().list(request, *args, **kwargs)
 
 
 # project views
@@ -26,8 +41,24 @@ class ProjectsAPI(
     serializer_class = ProjectSerializer
     queryset = Projects.objects.all()
 
+    def list(self, request: Request, *args, **kwargs):
+        if request.query_params:
+            return dynamic_search(
+                request=request, model=Projects, serializer=ProjectSerializer,
+                pagination_class=DynamicPagination()
+            )
+        return super().list(request, *args, **kwargs)
+
 
 # tasks view
 class TasksAPI(ModelViewSet):
     serializer_class = TasksSerializer
     queryset = Tasks.objects.all()
+
+    def list(self, request: Request, *args, **kwargs):
+        if request.query_params:
+            return dynamic_search(
+                request=request, model=Tasks, serializer=TasksSerializer,
+                pagination_class=DynamicPagination()
+            )
+        return super().list(request, *args, **kwargs)
