@@ -24,6 +24,7 @@ class ProjectSerializer(ModelSerializer):
 class TasksSerializer(ModelSerializer):
     user_detail = UsersSerializer(source='user', read_only=True)
     project_detail = ProjectSerializer(source='project', read_only=True)
+    foreman_detail = UsersSerializer(source='foreman', read_only=True)
 
     class Meta:
         model = models.Tasks
