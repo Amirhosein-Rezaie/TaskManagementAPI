@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     UsersAPI, ProjectsAPI, TasksAPI, TasksManager,
-    TasksProject,
+    TasksProject, TasksForeman,
 )
 
 # routers
@@ -34,5 +34,8 @@ urlpatterns = [
     ),
     path(
         'tasks-project/<int:project_id>/', TasksProject.as_view(), name='tasks-project'
+    ),
+    path(
+        'tasks-foreman/<int:foreman_id>/', TasksForeman.as_view(), name='tasks-foreman',
     )
 ]
