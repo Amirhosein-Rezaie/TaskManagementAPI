@@ -83,11 +83,16 @@ class Command(BaseCommand):
                         role=CoreModels.Users.Roles.MANAGER)
                     )
                 ),
+                foreman=random.choice(
+                    list(CoreModels.Users.objects.filter(
+                        role=CoreModels.Users.Roles.FOREMAN
+                    )) + [None]
+                ),
                 level=random.choice(task_levels_score),
                 deadline=faker_fa.future_date(
                     end_date=f'+{random.randint(3, 14)}d'
                 ),
-                status=random.choice(task_status),
+                # status=random.choice(task_status),
             )
         print('OK')
 
