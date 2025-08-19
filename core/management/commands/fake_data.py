@@ -33,6 +33,22 @@ class Command(BaseCommand):
                 username=faker_fa.user_name(),
                 password=make_password(faker_fa.password())
             )
+        CoreModels.Users.objects.create(
+            first_name='admin',
+            last_name='',
+            role=user_roles[0],
+            phone='1234',
+            username='admin',
+            password=make_password('admin')
+        )
+        CoreModels.Users.objects.create(
+            first_name='test',
+            last_name='user',
+            role=user_roles[1],
+            phone='12345',
+            username='user1',
+            password=make_password('1234')
+        )
         print('OK')
 
         # insert projects
