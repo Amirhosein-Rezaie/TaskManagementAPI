@@ -103,3 +103,13 @@ class TasksForeman(APIView):
         tasks = Tasks.objects.filter(Q(foreman=foreman))
         paginated_tasks = paginator.paginate_queryset(tasks, request)
         return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+
+
+# tasks that are picked
+class PickedTasks(APIView):
+    # permission_classes -> for logged in users
+
+    def get(self, request: Request):
+        tasks = Tasks.objects.filter(Q(status=Tasks.Status.PICKED))
+        paginated_tasks = paginator.paginate_queryset(tasks, request)
+        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
