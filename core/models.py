@@ -104,6 +104,9 @@ class Tasks(models.Model):
     user = models.ForeignKey(
         Users, on_delete=models.CASCADE, null=False, blank=False, related_name='user_task'
     )
+    foreman = models.ForeignKey(
+        Users, null=True, blank=True, on_delete=models.CASCADE
+    )
     level = models.IntegerField(
         choices=Levels, null=False, blank=False
     )
@@ -126,4 +129,12 @@ class Tasks(models.Model):
             raise ValidationError(
                 detail='نقض کاربر باید manager باشد ... !'
             )
+
+        if self.foreman:
+            if self.foreman.role != Users.Roles.FOREMAN:
+                raise ValidationError(
+                    detail='نقض کارمند باید foreman باشد ... !'
+                )
+            self.status = self.Status.PICKED
+
         return super().save(*args, **kwargs)
