@@ -15,6 +15,8 @@ from TaskManagementAPI.helper import (
 from TaskManagementAPI.pagination import (
     DynamicPagination
 )
+from rest_framework.views import APIView
+from django.db.models import Q
 
 
 # views
@@ -65,3 +67,18 @@ class TasksAPI(ModelViewSet):
                 pagination_class=DynamicPagination()
             )
         return super().list(request, *args, **kwargs)
+
+
+# paginator
+paginator = DynamicPagination()
+
+
+# tasks that the logged in manager added
+class TasksManager(APIView):
+    # permission_classes -> allow for logged in managers
+
+    def get(self, request: Request):
+        manager = request.user
+        tasks = Tasks.objects.filter(Q(user=manager.id))
+        paginated_tasks = paginator.paginate_queryset(tasks, request)
+        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)

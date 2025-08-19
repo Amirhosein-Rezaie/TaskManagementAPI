@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    UsersAPI, ProjectsAPI, TasksAPI
+    UsersAPI, ProjectsAPI, TasksAPI, TasksManager,
 )
 
 # routers
@@ -27,5 +27,8 @@ urlpatterns = [
     ),
     path(
         'tasks/', include(tasks_router.urls), name='all-tasks'
+    ),
+    path(
+        'tasks-manager/', TasksManager.as_view(), name='tasks-managet'
     )
 ]
