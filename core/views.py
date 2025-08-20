@@ -17,6 +17,9 @@ from TaskManagementAPI.pagination import (
 )
 from rest_framework.views import APIView
 from django.db.models import Q
+from action.models import (
+    Tags
+)
 
 
 # views
@@ -111,5 +114,22 @@ class PickedTasks(APIView):
 
     def get(self, request: Request):
         tasks = Tasks.objects.filter(Q(status=Tasks.Status.PICKED))
+        paginated_tasks = paginator.paginate_queryset(tasks, request)
+        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+
+
+# tasks that are done
+class DoneTasks(APIView):
+    # permission_classes -> for logged in users
+
+    def get(self, request: Request):
+        done_tasks_id_list = Tags.objects.filter(Q(
+            title=Tags.Titles.DONE
+        )).values_list('id', flat=True)
+
+        tasks = Tasks.objects.filter(Q(
+            id__in=done_tasks_id_list
+        ))
+
         paginated_tasks = paginator.paginate_queryset(tasks, request)
         return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
