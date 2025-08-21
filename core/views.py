@@ -170,9 +170,25 @@ class NotDoneProjects(APIView):
 
     def get(self, request: Request):
         projects = Projects.objects.filter(
-            ~Q(status__ne=Projects.Status.DONE)
+            ~Q(status=Projects.Status.DONE)
         )
         paginated_projects = paginator.paginate_queryset(projects, request)
         return paginator.get_paginated_response(ProjectSerializer(
             paginated_projects, many=True
+        ).data)
+
+
+# the tasks are on a specific deadline date or after
+class DeadLineTasks(APIView):
+    # permission_classes -> the logged in
+
+    def get(self, request: Request, dead_line):
+        tasks = Tasks.objects.filter(
+            Q(deadline__gte=dead_line)
+        )
+        paginated_tasks = paginator.paginate_queryset(
+            tasks, request
+        )
+        return paginator.get_paginated_response(TasksSerializer(
+            paginated_tasks, many=True
         ).data)

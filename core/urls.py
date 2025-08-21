@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     UsersAPI, ProjectsAPI, TasksAPI, TasksManager,
     TasksProject, TasksForeman, PickedTasks, DoneTasks, ProjectsManger,
-    DoneProjects, NotDoneProjects
+    DoneProjects, NotDoneProjects, DeadLineTasks
 )
 
 # routers
@@ -53,5 +53,8 @@ urlpatterns = [
     ),
     path(
         'not-done-projects/', NotDoneProjects.as_view(), name='not-done-projects'
+    ),
+    path(
+        'deadline-tasks/<dead_line>/', DeadLineTasks.as_view(), name='DeadLineTasks'
     )
 ]
