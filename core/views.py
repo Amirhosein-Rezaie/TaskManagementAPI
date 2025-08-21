@@ -18,7 +18,7 @@ from TaskManagementAPI.pagination import (
 from rest_framework.views import APIView
 from django.db.models import Q
 from action.models import (
-    Tags
+    Tags, ProjectMembers
 )
 
 
@@ -204,6 +204,31 @@ class DeadLineProjects(APIView):
         paginated_projects = paginator.paginate_queryset(
             projects, request
         )
+        return paginator.get_paginated_response(
+            ProjectSerializer(
+                paginated_projects, many=True
+            ).data
+        )
+
+
+# projects that are a specific foreman in member in
+class ProjectsForeman(APIView):
+    # permission_classes -> logged in users
+    def get(self, request: Request, foreman_id: int):
+        foreman = request.user.id or foreman_id
+
+        projects_id_list = ProjectMembers.objects.filter(
+            Q(member=foreman)
+        ).values_list('project', flat=True)
+
+        projects = Projects.objects.filter(
+            Q(id__in=projects_id_list)
+        )
+
+        paginated_projects = paginator.paginate_queryset(
+            projects, request
+        )
+
         return paginator.get_paginated_response(
             ProjectSerializer(
                 paginated_projects, many=True
