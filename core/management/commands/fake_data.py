@@ -65,6 +65,9 @@ class Command(BaseCommand):
                 user=random.choice(
                     list(CoreModels.Users.objects.filter(role=user_roles[0]))
                 ),
+                deadline=faker_fa.future_date(
+                    end_date=f"+{random.randint(1*30, 3*30)}d"
+                ),
                 status=random.choice(project_status)
             )
         print('OK')
