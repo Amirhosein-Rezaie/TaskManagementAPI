@@ -62,6 +62,9 @@ class Projects(models.Model):
         max_length=100, choices=Status,
         default=Status.IN_PROGRESS, null=False, blank=False
     )
+    deadline = models.DateField(
+        null=False, blank=True
+    )
     done_date = models.DateField(
         null=True, blank=True
     )
