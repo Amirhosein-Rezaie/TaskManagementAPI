@@ -148,3 +148,17 @@ class ProjectsManger(APIView):
         return paginator.get_paginated_response(ProjectSerializer(
             paginated_projects, many=True
         ).data)
+
+
+# projects that are done
+class DoneProjects(APIView):
+    # permission_classes -> just for manager
+
+    def get(self, request: Request):
+        projects = Projects.objects.filter(
+            Q(status=Projects.Status.DONE)
+        )
+        paginated_projects = paginator.paginate_queryset(projects, request)
+        return paginator.get_paginated_response(ProjectSerializer(
+            paginated_projects, many=True
+        ).data)
