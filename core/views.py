@@ -192,3 +192,20 @@ class DeadLineTasks(APIView):
         return paginator.get_paginated_response(TasksSerializer(
             paginated_tasks, many=True
         ).data)
+
+
+# the projects that are on specific deadline date
+class DeadLineProjects(APIView):
+    # permission_classes -> the logged in users
+    def get(self, request: Request, deadline):
+        projects = Projects.objects.filter(
+            Q(deadline__gte=deadline)
+        )
+        paginated_projects = paginator.paginate_queryset(
+            projects, request
+        )
+        return paginator.get_paginated_response(
+            ProjectSerializer(
+                paginated_projects, many=True
+            ).data
+        )
