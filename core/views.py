@@ -20,6 +20,9 @@ from django.db.models import Q
 from action.models import (
     Tags, ProjectMembers
 )
+from drf_spectacular.utils import (
+    OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+)
 
 
 # views
@@ -77,6 +80,10 @@ paginator = DynamicPagination()
 
 
 # tasks that the logged in manager added
+@extend_schema(
+    description="a API for manager that logged in",
+    responses=TasksSerializer(many=True)
+)
 class TasksManager(APIView):
     # permission_classes -> allow for logged in managers
 
@@ -88,6 +95,10 @@ class TasksManager(APIView):
 
 
 # tasks that is for specific project
+@extend_schema(
+    description="An API of tasks for a specific project.",
+    responses=TasksSerializer(many=True),
+)
 class TasksProject(APIView):
     # permission_classes -> for logged in users
 
@@ -98,6 +109,16 @@ class TasksProject(APIView):
 
 
 # tasks that is picked by a specific foreman
+@extend_schema(
+    description="An API of tasks for a specific foreman (logged in or by foreman_id)",
+    parameters=[
+        OpenApiParameter(
+            name="foreman_id", type=int, location=OpenApiParameter.PATH, required=False,
+            description="Optional foreman ID. If not provided, current logged in user is used."
+        )
+    ],
+    responses=TasksSerializer(many=True)
+)
 class TasksForeman(APIView):
     # permission_classes -> for logged in users
 
@@ -109,6 +130,10 @@ class TasksForeman(APIView):
 
 
 # tasks that are picked
+@extend_schema(
+    description="An API of tasks that are pick by one of foremans.",
+    responses=TasksSerializer(many=True)
+)
 class PickedTasks(APIView):
     # permission_classes -> for logged in users
 
@@ -119,6 +144,10 @@ class PickedTasks(APIView):
 
 
 # tasks that are done
+@extend_schema(
+    description="An API of tasks that are done by one of foremans.",
+    responses=TasksSerializer(many=True)
+)
 class DoneTasks(APIView):
     # permission_classes -> for logged in users
 
@@ -136,6 +165,16 @@ class DoneTasks(APIView):
 
 
 # project for manager logged in
+@extend_schema(
+    description="An API of projcets that are added by specific manager.",
+    parameters=[
+        OpenApiParameter(
+            name='manager-id', type=int, required=False,
+            description="If manager is logged in this parameter is not required."
+        )
+    ],
+    responses=ProjectSerializer(many=True),
+)
 class ProjectsManger(APIView):
     #  permission_classes -> loggin manager
 
@@ -151,6 +190,10 @@ class ProjectsManger(APIView):
 
 
 # projects that are done
+@extend_schema(
+    description="An API of projcets that are done",
+    responses=ProjectSerializer(many=True),
+)
 class DoneProjects(APIView):
     # permission_classes -> just for manager
 
@@ -165,6 +208,10 @@ class DoneProjects(APIView):
 
 
 # projects that are not done
+@extend_schema(
+    description="An API of projcets that are not done yet",
+    responses=ProjectSerializer(many=True),
+)
 class NotDoneProjects(APIView):
     # permission_classes -> just for manager
 
@@ -179,6 +226,10 @@ class NotDoneProjects(APIView):
 
 
 # the tasks are on a specific deadline date or after
+@extend_schema(
+    description="An API of tasks that are on a specific deadline date.",
+    responses=TasksSerializer(many=True)
+)
 class DeadLineTasks(APIView):
     # permission_classes -> the logged in
 
@@ -195,6 +246,10 @@ class DeadLineTasks(APIView):
 
 
 # the projects that are on specific deadline date
+@extend_schema(
+    description="An API of projcets that are on a specific deadline date.",
+    responses=ProjectSerializer(many=True),
+)
 class DeadLineProjects(APIView):
     # permission_classes -> the logged in users
     def get(self, request: Request, deadline):
@@ -212,6 +267,16 @@ class DeadLineProjects(APIView):
 
 
 # projects that are a specific foreman in member in
+@extend_schema(
+    description="An API of projcets that a specific foreman had been member in it.",
+    parameters=[
+        OpenApiParameter(
+            name='foreman_id', type=int, required=False,
+            description="If foreman logged in , it is not required to send this parameter.",
+        )
+    ],
+    responses=ProjectSerializer(many=True),
+)
 class ProjectsForeman(APIView):
     # permission_classes -> logged in users
     def get(self, request: Request, foreman_id: int):
