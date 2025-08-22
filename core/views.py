@@ -89,9 +89,17 @@ class TasksManager(APIView):
 
     def get(self, request: Request):
         manager = request.user
-        tasks = Tasks.objects.filter(Q(user=manager.id))
-        paginated_tasks = paginator.paginate_queryset(tasks, request)
-        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+        tasks = Tasks.objects.filter(
+            Q(user=manager.id)
+        )
+        paginated_tasks = paginator.paginate_queryset(
+            tasks, request
+        )
+        return paginator.get_paginated_response(
+            TasksSerializer(
+                paginated_tasks, many=True
+            ).data
+        )
 
 
 # tasks that is for specific project
@@ -103,9 +111,17 @@ class TasksProject(APIView):
     # permission_classes -> for logged in users
 
     def get(self, request: Request, project_id: int):
-        tasks = Tasks.objects.filter(Q(project=project_id))
-        paginated_tasks = paginator.paginate_queryset(tasks, request)
-        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+        tasks = Tasks.objects.filter(
+            Q(project=project_id)
+        )
+        paginated_tasks = paginator.paginate_queryset(
+            tasks, request
+        )
+        return paginator.get_paginated_response(
+            TasksSerializer(
+                paginated_tasks, many=True
+            ).data
+        )
 
 
 # tasks that is picked by a specific foreman
@@ -124,9 +140,17 @@ class TasksForeman(APIView):
 
     def get(self, request: Request, foreman_id: int):
         foreman = request.user.id if not foreman_id else foreman_id
-        tasks = Tasks.objects.filter(Q(foreman=foreman))
-        paginated_tasks = paginator.paginate_queryset(tasks, request)
-        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+        tasks = Tasks.objects.filter(
+            Q(foreman=foreman)
+        )
+        paginated_tasks = paginator.paginate_queryset(
+            tasks, request
+        )
+        return paginator.get_paginated_response(
+            TasksSerializer(
+                paginated_tasks, many=True
+            ).data
+        )
 
 
 # tasks that are picked
@@ -138,9 +162,17 @@ class PickedTasks(APIView):
     # permission_classes -> for logged in users
 
     def get(self, request: Request):
-        tasks = Tasks.objects.filter(Q(status=Tasks.Status.PICKED))
-        paginated_tasks = paginator.paginate_queryset(tasks, request)
-        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+        tasks = Tasks.objects.filter(
+            Q(status=Tasks.Status.PICKED)
+        )
+        paginated_tasks = paginator.paginate_queryset(
+            tasks, request
+        )
+        return paginator.get_paginated_response(
+            TasksSerializer(
+                paginated_tasks, many=True
+            ).data
+        )
 
 
 # tasks that are done
@@ -160,8 +192,14 @@ class DoneTasks(APIView):
             id__in=done_tasks_id_list
         ))
 
-        paginated_tasks = paginator.paginate_queryset(tasks, request)
-        return paginator.get_paginated_response(TasksSerializer(paginated_tasks, many=True).data)
+        paginated_tasks = paginator.paginate_queryset(
+            tasks, request
+        )
+        return paginator.get_paginated_response(
+            TasksSerializer(
+                paginated_tasks, many=True
+            ).data
+        )
 
 
 # project for manager logged in
