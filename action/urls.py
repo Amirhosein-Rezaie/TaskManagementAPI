@@ -1,6 +1,7 @@
 from django.urls import path, include
 from .views import (
-    TagsAPI, ScoresAPI, MembersAPI
+    TagsAPI, ScoresAPI, MembersAPI,
+    ForemanTags
 )
 from rest_framework.routers import DefaultRouter
 
@@ -28,4 +29,7 @@ urlpatterns = [
     path(
         'project-members/', include(members_router.urls), name='project-membres'
     ),
+    path(
+        'foreman-tags/', ForemanTags.as_view(), name='foreman-tags'
+    )
 ]
