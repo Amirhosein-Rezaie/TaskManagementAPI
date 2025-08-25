@@ -11,7 +11,7 @@ from core.models import (
 class IsManagerUser(BasePermission):
     def has_permission(self, request: Request, view):
         return bool(
-            (request.user or request.user.is_authenticated) and
+            (request.user.is_authenticated) and
             (request.user.role == Users.Roles.MANAGER)
         )
 
@@ -20,6 +20,6 @@ class IsManagerUser(BasePermission):
 class IsForemanUser(BasePermission):
     def has_permission(self, request: Request, view):
         return bool(
-            (request.user or request.user.is_authenticated) and
+            (request.user.is_authenticated) and
             (request.user.role == Users.Roles.FOREMAN)
         )
