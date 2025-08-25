@@ -30,7 +30,6 @@ from drf_spectacular.utils import (
 class UsersAPI(ModelViewSet):
     serializer_class = UsersSerializer
     queryset = Users.objects.all()
-    pagination_class = DynamicPagination
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -49,7 +48,6 @@ class ProjectsAPI(
 ):
     serializer_class = ProjectSerializer
     queryset = Projects.objects.all()
-    pagination_class = DynamicPagination
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -64,7 +62,6 @@ class ProjectsAPI(
 class TasksAPI(ModelViewSet):
     serializer_class = TasksSerializer
     queryset = Tasks.objects.all()
-    pagination_class = DynamicPagination
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:

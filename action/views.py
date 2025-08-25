@@ -34,7 +34,6 @@ class TagsAPI(
 ):
     serializer_class = TagsSerializer
     queryset = Tags.objects.all()
-    pagination_class = DynamicPagination
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -52,7 +51,6 @@ class ScoresAPI(
 ):
     serializer_class = ScoresSerializer
     queryset = Scores.objects.all()
-    pagination_class = DynamicPagination
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -70,7 +68,6 @@ class MembersAPI(
 ):
     serializer_class = ProjectMembersSerializer
     queryset = ProjectMembers.objects.all()
-    pagination_class = DynamicPagination
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
