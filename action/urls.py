@@ -1,7 +1,6 @@
 from django.urls import path, include
 from .views import (
     TagsAPI, ScoresAPI, MembersAPI,
-    ForemanTags
 )
 from rest_framework.routers import DefaultRouter
 
