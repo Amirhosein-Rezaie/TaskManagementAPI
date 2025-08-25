@@ -28,8 +28,5 @@ urlpatterns = [
     ),
     path(
         'project-members/', include(members_router.urls), name='project-membres'
-    ),
-    path(
-        'foreman-tags/', ForemanTags.as_view(), name='foreman-tags'
     )
 ]

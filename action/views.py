@@ -85,32 +85,3 @@ class MembersAPI(
 paginator = DynamicPagination()
 
 
-# the tags are for a specific foreman
-class ForemanTags(APIView):
-    # permission_classes -> for logged in user
-
-    def get(self, request: Request):
-        foreman = request.query_params.get('foreman') or request.user.id
-        if not foreman:
-            raise ValidationError(
-                detail="No parameter found as foreman ID"
-            )
-        try:
-            if Users.objects.get(Q(id=foreman)).role != Users.Roles.FOREMAN:
-                raise ValidationError(
-                    detail="This user is not foreman"
-                )
-        except Users.DoesNotExist as e:
-            raise ValidationError(
-                detail="User not found"
-            )
-        tags = Tags.objects.filter(
-            Q(user=foreman)
-        )
-        paginator.page_size = limit_paginate(request, DynamicPagination)
-        paginated_data = paginator.paginate_queryset(
-            tags, request
-        )
-        return paginator.get_paginated_response(
-            TagsSerializer(paginated_data, many=True).data
-        )
