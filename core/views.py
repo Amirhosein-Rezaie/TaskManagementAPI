@@ -337,3 +337,25 @@ class ProjectsForeman(APIView):
                 paginated_projects, many=True
             ).data
         )
+
+
+# collaborators (foremans) of a specific project
+@extend_schema(
+    description="An API for foremans that are in a specific project",
+    responses=UsersSerializer(many=True)
+)
+class MembersProject(APIView):
+    # permission_classes -> manager
+    def get(self, request: Request, project_id: int):
+        project = project_id
+        members = Users.objects.filter(
+            Q(id__in=ProjectMembers.objects.filter(
+                Q(project=project)
+            ).values_list('member', flat=True))
+        )
+        paginated_data = paginator.paginate_queryset(
+            members, request
+        )
+        return paginator.get_paginated_response(
+            UsersSerializer(paginated_data, many=True).data
+        )

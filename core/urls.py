@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     UsersAPI, ProjectsAPI, TasksAPI, TasksManager,
     TasksProject, TasksForeman, PickedTasks, DoneTasks, ProjectsManger,
-    DoneProjects, NotDoneProjects, DeadLineTasks, DeadLineProjects, ProjectsForeman
+    DoneProjects, NotDoneProjects, DeadLineTasks, DeadLineProjects, ProjectsForeman,
+    MembersProject,
 )
 
 # routers
@@ -62,5 +63,8 @@ urlpatterns = [
     ),
     path(
         'projects-foreman/<int:foreman_id>/', ProjectsForeman.as_view(), name='ProjectsForeman'
+    ),
+    path(
+        'members-project/<int:project_id>/', MembersProject.as_view(), name='members-project'
     )
 ]
