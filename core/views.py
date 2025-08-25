@@ -1,6 +1,6 @@
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import (
-    ListModelMixin, CreateModelMixin, DestroyModelMixin, UpdateModelMixin, RetrieveModelMixin
+    ListModelMixin, CreateModelMixin, UpdateModelMixin, RetrieveModelMixin
 )
 from .serializers import (
     UsersSerializer, ProjectSerializer, TasksSerializer
@@ -21,8 +21,12 @@ from action.models import (
     Tags, ProjectMembers
 )
 from drf_spectacular.utils import (
-    OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+    OpenApiParameter, extend_schema
 )
+from TaskManagementAPI.permissions import (
+    IsManagerUser
+)
+from rest_framework.permissions import IsAuthenticated
 
 
 # views
@@ -30,6 +34,7 @@ from drf_spectacular.utils import (
 class UsersAPI(ModelViewSet):
     serializer_class = UsersSerializer
     queryset = Users.objects.all()
+    permission_classes = [IsManagerUser]
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -48,6 +53,7 @@ class ProjectsAPI(
 ):
     serializer_class = ProjectSerializer
     queryset = Projects.objects.all()
+    permission_classes = [IsManagerUser]
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -62,6 +68,7 @@ class ProjectsAPI(
 class TasksAPI(ModelViewSet):
     serializer_class = TasksSerializer
     queryset = Tasks.objects.all()
+    permission_classes = [IsManagerUser]
 
     def list(self, request: Request, *args, **kwargs):
         if request.query_params:
@@ -82,7 +89,7 @@ paginator = DynamicPagination()
     responses=TasksSerializer(many=True)
 )
 class TasksManager(APIView):
-    # permission_classes -> allow for logged in managers
+    permission_classes = [IsManagerUser]
 
     def get(self, request: Request):
         manager = request.user
@@ -105,7 +112,7 @@ class TasksManager(APIView):
     responses=TasksSerializer(many=True),
 )
 class TasksProject(APIView):
-    # permission_classes -> for logged in users
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, project_id: int):
         tasks = Tasks.objects.filter(
@@ -133,7 +140,7 @@ class TasksProject(APIView):
     responses=TasksSerializer(many=True)
 )
 class TasksForeman(APIView):
-    # permission_classes -> for logged in users
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, foreman_id: int):
         foreman = request.user.id if not foreman_id else foreman_id
@@ -156,7 +163,7 @@ class TasksForeman(APIView):
     responses=TasksSerializer(many=True)
 )
 class PickedTasks(APIView):
-    # permission_classes -> for logged in users
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request):
         tasks = Tasks.objects.filter(
@@ -178,7 +185,7 @@ class PickedTasks(APIView):
     responses=TasksSerializer(many=True)
 )
 class DoneTasks(APIView):
-    # permission_classes -> for logged in users
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request):
         done_tasks_id_list = Tags.objects.filter(Q(
@@ -211,7 +218,7 @@ class DoneTasks(APIView):
     responses=ProjectSerializer(many=True),
 )
 class ProjectsManger(APIView):
-    #  permission_classes -> loggin manager
+    permission_classes = [IsManagerUser]
 
     def get(self, request: Request):
         manager = request.query_params.get('manager-id') or request.user.id
@@ -230,7 +237,7 @@ class ProjectsManger(APIView):
     responses=ProjectSerializer(many=True),
 )
 class DoneProjects(APIView):
-    # permission_classes -> just for manager
+    permission_classes = [IsManagerUser]
 
     def get(self, request: Request):
         projects = Projects.objects.filter(
@@ -248,7 +255,7 @@ class DoneProjects(APIView):
     responses=ProjectSerializer(many=True),
 )
 class NotDoneProjects(APIView):
-    # permission_classes -> just for manager
+    permission_classes = [IsManagerUser]
 
     def get(self, request: Request):
         projects = Projects.objects.filter(
@@ -266,7 +273,7 @@ class NotDoneProjects(APIView):
     responses=TasksSerializer(many=True)
 )
 class DeadLineTasks(APIView):
-    # permission_classes -> the logged in
+    permission_classes = [IsManagerUser]
 
     def get(self, request: Request, dead_line):
         tasks = Tasks.objects.filter(
@@ -286,7 +293,8 @@ class DeadLineTasks(APIView):
     responses=ProjectSerializer(many=True),
 )
 class DeadLineProjects(APIView):
-    # permission_classes -> the logged in users
+    permission_classes = [IsAuthenticated]
+
     def get(self, request: Request, deadline):
         projects = Projects.objects.filter(
             Q(deadline__gte=deadline)
@@ -313,7 +321,8 @@ class DeadLineProjects(APIView):
     responses=ProjectSerializer(many=True),
 )
 class ProjectsForeman(APIView):
-    # permission_classes -> logged in users
+    permission_classes = [IsAuthenticated]
+
     def get(self, request: Request, foreman_id: int):
         foreman = request.user.id or foreman_id
 
@@ -342,7 +351,8 @@ class ProjectsForeman(APIView):
     responses=UsersSerializer(many=True)
 )
 class MembersProject(APIView):
-    # permission_classes -> manager
+    permission_classes = [IsManagerUser]
+
     def get(self, request: Request, project_id: int):
         project = project_id
         members = Users.objects.filter(
