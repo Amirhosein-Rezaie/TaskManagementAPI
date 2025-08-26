@@ -6,6 +6,10 @@ from .views import (
     DoneProjects, NotDoneProjects, DeadLineTasks, DeadLineProjects, ProjectsForeman,
     MembersProject,
 )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView, TokenRefreshView,
+)
+
 
 # routers
 # user routers
@@ -22,6 +26,12 @@ tasks_router.register('', TasksAPI, basename='all-tasks')
 
 # urls
 urlpatterns = [
+    path(
+        'token/', TokenObtainPairView.as_view(), name='token_obtain_pair',
+    ),
+    path(
+        'refresh-token/', TokenRefreshView.as_view(), name='token_obtain_pair',
+    ),
     path(
         'users/', include(users_router.urls), name='all-users'
     ),
